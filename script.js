@@ -42,7 +42,19 @@ async function startScanner() {
 
                 const hasil = await kirimAbsen(decodedText);
 
-                pesan.textContent = hasil.pesan;
+                if (hasil.success) {
+
+    document.getElementById("nama").textContent = hasil.nama;
+    document.getElementById("nis").textContent = hasil.nis;
+    document.getElementById("kelas").textContent = hasil.kelas;
+
+    pesan.textContent = hasil.pesan + " (" + hasil.jam + ")";
+
+} else {
+
+    pesan.textContent = hasil.pesan;
+
+}
 
                 status.textContent = hasil.success
                     ? "Absensi Berhasil"
