@@ -39,13 +39,13 @@ async function startScanner() {
                 scannerRunning = false;
 
                 status.textContent = "Mengirim absensi...";
-                setTimeout(async () => {
-                    document.getElementById("nama").textContent = "-";
-                    document.getElementById("nis").textContent = "-";
-                    document.getElementById("kelas").textContent = "-";
-                    document.getElementById("pesan").textContent = "Menunggu QR Code...";
-                    await startScanner();
-                }, 2000);
+                // setTimeout(async () => {
+                //     document.getElementById("nama").textContent = "-";
+                //     document.getElementById("nis").textContent = "-";
+                //     document.getElementById("kelas").textContent = "-";
+                //     document.getElementById("pesan").textContent = "Menunggu QR Code...";
+                //     await startScanner();
+                // }, 2000);
 
                 const hasil = await kirimAbsen(decodedText);
 
