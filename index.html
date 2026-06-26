@@ -1,1 +1,56 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <title>Absensi QR Sekolah</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <script src="https://unpkg.com/html5-qrcode"></script>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>📚 Absensi QR Sekolah</h1>
+
+    <div class="status">
+        Status Kamera :
+        <span id="status">Belum Aktif</span>
+    </div>
+
+    <br>
+
+    <button id="btnStart">
+        Aktifkan Kamera
+    </button>
+
+    <br><br>
+
+    <div id="reader"></div>
+
+    <br>
+
+    <div class="hasil">
+
+        <p><strong>Nama :</strong> <span id="nama">-</span></p>
+
+        <p><strong>NIS :</strong> <span id="nis">-</span></p>
+
+        <p><strong>Kelas :</strong> <span id="kelas">-</span></p>
+
+        <h2 id="pesan">
+            Menunggu QR Code...
+        </h2>
+
+    </div>
+
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
