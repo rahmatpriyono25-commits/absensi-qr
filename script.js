@@ -15,81 +15,66 @@ async function startScanner() {
 
         const cameras = await Html5Qrcode.getCameras();
 
-        if (cameras.length === 0) {
+        if (!cameras.length) {
             status.textContent = "Tidak ada kamera";
             return;
         }
 
-        scanner = new Html5Qrcode("reader");
+        if (!scanner) {
+            scanner = new Html5Qrcode("reader");
+        }
+
+        scannerRunning = true;
 
         await scanner.start(
-            cameras[0].id,
+
+            { facingMode: "environment" },
+
             {
                 fps: 10,
-                qrbox: {
-                    width: 250,
-                    height: 250
-                }
+                qrbox: 250
             },
-
-            async function(decodedText) {
-
-                // Hentikan scanner agar tidak scan berulang
-                await scanner.stop();
-                scannerRunning = false;
-
-                status.textContent = "Mengirim absensi...";
-                // setTimeout(async () => {
-                //     document.getElementById("nama").textContent = "-";
-                //     document.getElementById("nis").textContent = "-";
-                //     document.getElementById("kelas").textContent = "-";
-                //     document.getElementById("pesan").textContent = "Menunggu QR Code...";
-                //     await startScanner();
-                // }, 2000);
-
-                const hasil = await kirimAbsen(decodedText);
-
-                if (hasil.success) {
-
-                        document.getElementById("nama").textContent = hasil.nama;
-                        document.getElementById("nis").textContent = hasil.nis;
-                        document.getElementById("kelas").textContent = hasil.kelas;
-
-                        pesan.textContent = hasil.pesan + " (" + hasil.jam + ")";
-
-                } else {
-                        pesan.textContent = hasil.pesan;
-                }
-                        status.textContent = hasil.success
-                            ? "Absensi Berhasil"
-                            : "Absensi Gagal";
-                        restartScanner();
-            },
-                function(errorMessage) {
-                    // Abaikan error pembacaan QR
-                }
-        );
-        scannerRunning = true;
-        status.textContent = "Kamera Aktif";
-            } catch(err) {
-
-                console.error(err);
-
-                status.textContent = "ERROR";
-
-                alert(err.message || err);
-
+            onScanSuccess,
+            () => {
+                // abaikan error pembacaan
             }
-
+        );
+        status.textContent = "Kamera Aktif";
+    } catch (err) {
+        console.error(err);
+        status.textContent = err.message;
+    }
 }
-
-async function restartScanner() {
-    document.getElementById("nama").textContent = "-";
-    document.getElementById("nis").textContent = "-";
-    document.getElementById("kelas").textContent = "-";
-    document.getElementById("pesan").textContent = "Menunggu QR Code...";
-
-    setTimeout(() => {
-        startScanner();
-    }, 2000);
+async function onScanSuccess(decodedText) {
+    if (!scannerRunning) return;
+    scannerRunning = false;
+    status.textContent = "Mengirim absensi...";
+    try {
+        await scanner.pause(true);
+        const hasil = await kirimAbsen(decodedText);
+        if (hasil.success) {
+            document.getElementById("nama").textContent = hasil.nama;
+            document.getElementById("nis").textContent = hasil.nis;
+            document.getElementById("kelas").textContent = hasil.kelas;
+            pesan.textContent =
+                hasil.pesan + " (" + hasil.jam + ")";
+            status.textContent = "Absensi Berhasil";
+        } else {
+            pesan.textContent = hasil.pesan;
+            status.textContent = "Absensi Gagal";
+        }
+        setTimeout(async () => {
+            document.getElementById("nama").textContent = "-";
+            document.getElementById("nis").textContent = "-";
+            document.getElementById("kelas").textContent = "-";
+            document.getElementById("pesan").textContent = "Menunggu QR Code...";
+            await scanner.resume();
+            scannerRunning = true;
+            status.textContent = "Kamera Aktif";
+        }, 2000);
+    } catch (err) {
+        console.error(err);
+        status.textContent = "ERROR";
+        pesan.textContent = err.toString();
+    }
 }
