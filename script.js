@@ -1,18 +1,39 @@
+let scanner = null;
+
 document.getElementById("btnStart").addEventListener("click", async function () {
 
-    alert("Langkah 1");
+    const status = document.getElementById("status");
 
     try {
 
         const cameras = await Html5Qrcode.getCameras();
 
-        alert("Jumlah kamera: " + cameras.length);
+        if (cameras.length === 0) {
+            status.innerHTML = "Tidak ada kamera";
+            return;
+        }
 
-        console.log(cameras);
+        scanner = new Html5Qrcode("reader");
 
-    } catch (err) {
+        await scanner.start(
+            cameras[0].id,
+            {
+                fps: 10,
+                qrbox: 250
+            },
+            function(decodedText) {
 
-        alert("ERROR: " + err);
+                document.getElementById("pesan").innerHTML =
+                    "QR : " + decodedText;
+
+            }
+        );
+
+        status.innerHTML = "Kamera Aktif";
+
+    } catch(err) {
+
+        status.innerHTML = err;
 
         console.error(err);
 
