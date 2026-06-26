@@ -38,25 +38,28 @@ async function startScanner() {
         status.textContent = "Memulai kamera...";
 
         await scanner.start(
-            cameraId,
-            {
-                fps: 10,
-                qrbox: {
-                    width: 250,
-                    height: 250
-                }
-            },
-            function (decodedText) {
+    cameraId,
+    {
+        fps: 15,
+        qrbox: {
+            width: 300,
+            height: 300
+        },
+        aspectRatio: 1.0
+    },
+    function(decodedText, decodedResult) {
 
-                console.log("QR:", decodedText);
+        console.log("QR Terbaca:", decodedText);
 
-                pesan.textContent = "QR Terbaca : " + decodedText;
+        alert("QR Terbaca: " + decodedText);
 
-            },
-            function (errorMessage) {
-                // Error scan diabaikan
-            }
-        );
+        pesan.textContent = "QR Terbaca: " + decodedText;
+
+    },
+    function(errorMessage) {
+        // Biarkan kosong
+    }
+);
 
         scannerRunning = true;
 
