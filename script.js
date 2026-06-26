@@ -7,39 +7,66 @@ const pesan = document.getElementById("pesan");
 
 btnStart.addEventListener("click", startScanner);
 
-async function (decodedText) {
+async function startScanner() {
+
+    if (scannerRunning) return;
 
     try {
 
-        // Hentikan scanner supaya QR tidak terbaca berkali-kali
-        await scanner.stop();
-        scannerRunning = false;
+        const cameras = await Html5Qrcode.getCameras();
 
-        status.textContent = "Mengirim data...";
+        if (cameras.length === 0) {
+            status.textContent = "Tidak ada kamera";
+            return;
+        }
 
-        const response = await fetch(API_URL, {
-            method: "POST",
-            headers: {
-                "Content-Type": "text/plain;charset=UTF-8"
+        scanner = new Html5Qrcode("reader");
+
+        await scanner.start(
+            cameras[0].id,
+            {
+                fps: 10,
+                qrbox: {
+                    width: 250,
+                    height: 250
+                }
             },
-            body: JSON.stringify({
-                nis: decodedText
-            })
-        });
 
-        const hasil = await response.json();
+            async function(decodedText) {
 
-        pesan.textContent = hasil.pesan;
+                // Hentikan scanner agar tidak scan berulang
+                await scanner.stop();
+                scannerRunning = false;
 
-        status.textContent = "Selesai";
+                status.textContent = "Mengirim absensi...";
 
-    } catch (err) {
+                const hasil = await kirimAbsen(decodedText);
+
+                pesan.textContent = hasil.pesan;
+
+                status.textContent = hasil.success
+                    ? "Absensi Berhasil"
+                    : "Absensi Gagal";
+
+            },
+
+            function(errorMessage) {
+                // Abaikan error pembacaan QR
+            }
+
+        );
+
+        scannerRunning = true;
+
+        status.textContent = "Kamera Aktif";
+
+    } catch(err) {
 
         console.error(err);
 
-        pesan.textContent = err.toString();
+        status.textContent = "ERROR";
 
-        status.textContent = "Gagal";
+        alert(err.message || err);
 
     }
 
