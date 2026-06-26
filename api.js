@@ -1,7 +1,5 @@
 async function kirimAbsen(nis) {
-
     try {
-
         const response = await fetch(API_URL, {
             method: "POST",
             headers: {
@@ -11,20 +9,14 @@ async function kirimAbsen(nis) {
                 nis: nis
             })
         });
-
         const hasil = await response.json();
-
         return hasil;
-
     } catch (err) {
-
         console.error(err);
-
         return {
             success: false,
             pesan: err.toString()
         };
-
     }
 
 }
